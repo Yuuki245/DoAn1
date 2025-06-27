@@ -1,0 +1,30 @@
+{
+  "version": "1.0",
+  "defaultProvider": "cdnjs",
+  "libraries": [
+    {
+      "library": "jqueryui@1.13.2",
+      "destination": "wwwroot/lib/jqueryui"
+    },
+    {
+      "library": "jquery-easing@1.4.1",
+      "destination": "wwwroot/lib/jquery-easing"
+    },
+    {
+      "library": "elfinder@2.1.62",
+      "destination": "wwwroot/lib/elfinder"
+    },
+    {
+      "library": "typeahead.js@0.11.1",
+      "destination": "wwwroot/lib/typeahead"
+    },
+    {
+      "library": "multiple-select@1.2.3",
+      "destination": "wwwroot/lib/multiple-select"
+    },
+    {
+      "library": "summernote@0.8.20",
+      "destination": "wwwroot/lib/summernote"
+    }
+  ]
+}

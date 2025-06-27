@@ -1,0 +1,70 @@
+﻿@model truyenchu.Areas.Identity.Models.ManageViewModels.MyAccountViewModel
+
+<div class="container">
+    <h1 class="my-4">Thông tin tài khoản</h1>
+    @if (TempData["StatusMessageUpdateAccount"] != null)
+    {
+        <div class="alert alert-success">
+            @TempData["StatusMessageUpdateAccount"]
+        </div>
+    }
+    <form asp-action="UpdateAccount" method="post">
+        <div class="mb-3">
+            <label for="UserName" class="form-label">Tên đăng nhập</label>
+            <input type="text" class="form-control" id="UserName" value="@Model.UserName" readonly />
+        </div>
+
+        <div class="mb-3">
+            <label for="Email" class="form-label">Email</label>
+            <input asp-for="Email" class="form-control" id="Email" />
+            <span asp-validation-for="Email" class="text-danger"></span>
+        </div>
+
+        <div class="mb-3">
+            <label for="PhoneNumber" class="form-label">Số điện thoại</label>
+            <input asp-for="PhoneNumber" class="form-control" id="PhoneNumber" />
+            <span asp-validation-for="PhoneNumber" class="text-danger"></span>
+        </div>
+
+        <div class="mb-3">
+            <label for="Roles" class="form-label">Vai trò</label>
+            <input type="text" class="form-control" id="Roles" value="@Model.Roles" readonly />
+        </div>
+
+        <button type="submit" class="btn btn-primary">Cập nhật thông tin</button>
+    </form>
+</div>
+
+<div class="container mt-5">
+    <h1 class="my-4">Đổi mật khẩu</h1>
+    @if (TempData["StatusMessageUpdatePassword"] != null)
+    {
+        <div class="alert alert-success">
+            @TempData["StatusMessageUpdatePassword"]
+        </div>
+    }
+    <form asp-action="ChangePassword" method="post">
+        <div class="mb-3">
+            <label for="OldPassword" class="form-label">Mật khẩu hiện tại</label>
+            <input asp-for="PasswordModel.OldPassword" class="form-control" id="OldPassword" />
+            <span asp-validation-for="PasswordModel.OldPassword" class="text-danger"></span>
+        </div>
+
+        <div class="mb-3">
+            <label for="NewPassword" class="form-label">Mật khẩu mới</label>
+            <input asp-for="PasswordModel.NewPassword" class="form-control" id="NewPassword" />
+            <span asp-validation-for="PasswordModel.NewPassword" class="text-danger"></span>
+        </div>
+
+        <div class="mb-3">
+            <label for="ConfirmPassword" class="form-label">Xác nhận mật khẩu</label>
+            <input asp-for="PasswordModel.ConfirmPassword" class="form-control" id="ConfirmPassword" />
+            <span asp-validation-for="PasswordModel.ConfirmPassword" class="text-danger"></span>
+        </div>
+
+        <button type="submit" class="btn btn-primary">Đổi mật khẩu</button>
+    </form>
+</div>
+@section Scripts {
+    <partial name="_ValidationScriptsPartial" />
+}

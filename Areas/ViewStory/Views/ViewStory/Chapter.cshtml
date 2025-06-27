@@ -1,0 +1,39 @@
+@model ChapterViewModel
+@{
+    ViewData["Title"] = $"{Model.Story.StoryName} - Chương {Model.Chapter.Order}" ;
+    TempData["ShowSettingMenu"] = true;
+}
+
+<div id="chapter-container" class="row justify-content-center">
+    @* Title *@
+    <div class="text-center mt-4">
+        <a asp-action="DetailStory" asp-route-storySlug="@Model.Story.StorySlug" class="fs-3 fw-bold text-uppercase text-success text-decoration-none">@Model.Story.StoryName</a>
+    </div>
+    <p class="chapter-order text-center mb-4">Chương @Model.Chapter.Order: @Model.Chapter.Title</p>
+
+
+    @* Navigation *@
+    @await Component.InvokeAsync(nameof(truyenchu.Components.ChapterNavigation), 
+                                new {Chapter = Model.Chapter, Story = Model.Story})
+
+    @* Content *@
+    <div class="chapter-content mb-4">
+        @Html.Raw(Model.Chapter.Content)
+    </div>
+
+    @* Navigation *@
+    @await Component.InvokeAsync(nameof(truyenchu.Components.ChapterNavigation), 
+                                new {Chapter = Model.Chapter, Story = Model.Story})
+
+</div>
+
+@section Scripts {
+    <script>
+        $(document).ready(function() {
+            var chapterContent = $('.chapter-content, .chapter-content *')
+            var selects = $(".dropdown-menu.story-setting select")
+            RetrieveTheme(chapterContent);
+            setEventSelectChange(selects, chapterContent);
+        })
+    </script>
+}

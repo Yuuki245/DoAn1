@@ -1,0 +1,55 @@
+@using truyenchu.Components.DetailSidebar
+@model DetailSidebar.DetailSidebarViewModel
+
+@if (Model.sameAuthorStories.Any())
+{
+    <div class="list-title border-bottom">
+        <h2>        
+            <a href="#">Truyện cùng tác giả</a>
+        </h2>
+    </div>
+    <table class="story-table table table-borderless">
+        <tbody>
+            @foreach (var story in Model.sameAuthorStories)
+            {
+                <tr><td><a class="fw-semibold" asp-action="DetailStory" asp-route-storySlug="@story.StorySlug">
+                    @story.StoryName
+                </a></td></tr>
+            }
+        </tbody>
+    </table>
+}
+
+@if (Model.relatedStories != null) 
+{
+    <div class="list-title border-bottom">
+        <h2>        
+            <a href="#">Truyện cùng thể loại</a>
+        </h2>
+    </div>
+    <table class="story-table table table-borderless">
+        <tbody>
+            @foreach(var story in Model.relatedStories) {
+                <tr>
+                    <td>
+                        <a class="fw-medium text-green" asp-action="DetailStory" asp-route-storySlug="@story.StorySlug">@story.StoryName</a>
+                        <small class="d-block">
+                            @{
+                                var cates = story.StoryCategory.Select(x=>x.Category).ToList();
+                            }
+                            
+                            @for (var i = 0; i < cates.Count;i++)
+                            {
+                                <a asp-controller="SearchStory" asp-action="SearchCategory" asp-route-categorySlug="@cates[i].CategorySlug">
+                                    @cates[i].CategoryName
+                                </a>
+                                @(i == cates.Count - 1 ? "" : Html.Raw("<text>, </text>"))
+                                
+                            }
+                        </small>
+                    </td>
+                </tr>
+            }
+        </tbody>
+    </table>
+}

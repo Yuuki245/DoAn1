@@ -1,0 +1,131 @@
+#navbartop {
+    background-color: $header-bg-color !important;
+    a {
+        color: $text-color !important;
+    }
+    .navbar-brand {
+        color: $text-color !important;
+        font-weight: bold;
+        letter-spacing: 2px;
+    }
+    .navbar-toggler {
+        border-color: $text-color;
+        box-shadow: none;
+    }
+    .dropdown-menu {
+        background-color: #0a3b71;
+        a:hover {
+            background-color: #1461d0;
+        }
+        &.story-setting {
+            color: white;
+            width: 300px;
+            padding: 15px;
+            font-size: 14px;
+            .form-group {
+                display: flex;
+                align-items: baseline;
+                margin-bottom: 10px;
+                select {
+                    padding: 4px;
+                    font-size: 14px;
+                }
+                &:nth-last-child(1) {
+                    margin-bottom: 0;
+                }
+            }
+        }
+    }
+    ul > li {
+        font-weight: 500;
+    }
+}
+#navbar-search {
+    .twitter-typeahead {
+        width: 100%;
+    }
+
+    // Suggestion
+    .tt-menu {
+        width: max-content;
+        background-color: rgba(
+            var(--bs-dark-rgb),
+            var(--bs-bg-opacity)
+        ) !important;
+    }
+    .tt-suggestion.tt-selectable {
+        &:hover {
+            background-color: $secondary-color;
+        }
+        padding: 0;
+        a {
+            display: inline-block;
+            text-decoration: none;
+            padding: 10px 12px;
+            color: $text-color !important;
+        }
+    }
+    input {
+        padding: 0px 12px;
+        box-shadow: none;
+        border: none;
+        color: $text-color !important;
+        width: 100%;
+        height: 100%;
+    }
+    button {
+        border-width: 1px;
+        border-color: #92bb35 !important;
+        color: #92bb35;
+        font-weight: bold;
+        box-shadow: none;
+        &:hover {
+            background-color: #92bb35;
+            color: white;
+        }
+    }
+}
+
+// Breadcrumbs
+#breadcrumb {
+    padding: 5px 0px;
+    background-color: $breadcrumb-bg-color;
+    a {
+        text-decoration: none;
+        color: rgba($color: $text-color, $alpha: 0.7);
+    }
+    .breadcrumb {
+        margin-bottom: 0;
+        .breadcrumb-item {
+            color: $text-color;
+            a:hover {
+                text-decoration: underline;
+            }
+        }
+    }
+}
+
+@media only screen and (max-width: 768px) {
+    #navbartop {
+        .navbar-collapse {
+            margin-top: 12px;
+            padding-top: 8px;
+            border-top: 1px solid rgba($color: white, $alpha: 0.9);
+        }
+
+        #navbar-search {
+            padding-top: 10px;
+            border-top: 1px solid rgba($color: white, $alpha: 0.9);
+        }
+
+        .auth-buttons {
+            display: flex; /* Hi?n th? các nút theo hàng ngang */
+            gap: 10px; /* Kho?ng cách gi?a các nút */
+            position: absolute; /* ??t v? trí tuy?t ??i ?? ??nh v? */
+            right: 15px; /* Sát góc ph?i */
+            top: 50%; /* Canh gi?a theo chi?u d?c */
+            transform: translateY(-50%); /* Cân ch?nh chính xác v? trí d?c */
+            align-items: center; /* C?n gi?a theo chi?u d?c */
+        }
+    }
+}

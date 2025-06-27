@@ -1,0 +1,162 @@
+﻿@using Microsoft.EntityFrameworkCore
+@using truyenchu.Utilities
+@model truyenchu.Area.ViewStory.Model.IndexViewModel
+@inject truyenchu.Data.AppDbContext context
+@{
+    ViewData["Title"] = "Đọc truyện online miễn phí";
+}
+@* Danh sách truyện *@
+<div class="list-title border-bottom">
+    <h2>
+        <a id="hot-select-link" asp-controller="SearchStory" asp-action="SearchCategory">Truyện hot</a>
+    </h2>
+    <select id="hot-select" asp-items="@Model.SelectListItems" class="form-select w-auto rounded-0">
+        <option value="" selected>Tất cả</option>
+    </select>
+</div>
+<div id="box-hot-select" class="row mt-2 justify-content-start"></div>
+
+
+@* Truyện mới cập nhật *@
+<div class="row">
+    <div class="col-xl-4 col-lg-12 order-xl-2">
+        <div class="row">
+            @if (User.Identity.IsAuthenticated)
+            {
+                @if (Model.ReadingStories != null && Model.ReadingStories.Any())
+                {
+                    <div class="col-12 reading-story">
+                        <div class="list-title border-bottom">
+                            <h2>
+                                <a href="#">Truyện đang đọc</a>
+                            </h2>
+                        </div>
+                        <table class="story-table table table-borderless">
+                            <tbody>
+                                @foreach (var item in Model.ReadingStories)
+                                {
+                                    <tr>
+                                        <td>
+                                            <a asp-action="DetailStory" asp-route-storySlug="@item.StorySlug">@item.StoryName</a>
+                                        </td>
+                                        <td>
+                                            <a asp-action="Chapter" asp-route-storySlug="@item.StorySlug" asp-route-chapterOrder="@item.ChapterOrder">
+                                                Đọc tiếp Chương @item.ChapterOrder
+                                            </a>
+                                        </td>
+                                    </tr>
+                                }
+                            </tbody>
+                        </table>
+                    </div>
+                }
+                else
+                {
+                    <div class="col-12 reading-story">
+                        <p>Bạn chưa đọc truyện nào gần đây.</p>
+                    </div>
+                }
+            }
+            else
+            {
+                <div class="col-12 reading-story">
+                    <p>Bạn cần <a href="/login">đăng nhập</a> để xem danh sách truyện đang đọc.</p>
+                </div>
+            }
+            <div class="col-12 d-none d-xl-block">
+                @await Component.InvokeAsync(nameof(truyenchu.Components.CategoriesSidebar))
+            </div>
+        </div>
+    </div>
+    <div class="col-xl-8 col-lg-12 order-xl-1">
+        <div class="list-title border-bottom">
+            <h2>
+                Truyện mới cập nhật
+            </h2>
+        </div>
+        <div>
+            @await Component.InvokeAsync(nameof(truyenchu.Components.StoriesLatest))
+        </div>
+    </div>
+</div>
+
+@* TRuyện đã hoàn thành *@
+<div class="list-title border-bottom">
+    <h2>
+        <a id="full-select-link" asp-controller="SearchStory" asp-action="SearchCategory" asp-route-isFull="true">Truyện đã hoàn thành</a>
+    </h2>
+    <select id="full-select" asp-items="@Model.SelectListItems" class="form-select w-auto rounded-0">
+        <option value="" selected>Tất cả</option>
+    </select>
+</div>
+<div id="box-full-select" class="row mt-2 justify-content-start"></div>
+
+@section Scripts {
+    <script>
+        function LoadStories(type, categorySlug = "all", count = 12, container) {
+            $.ajax({
+                url: "@Url.Action("GetStoriesByCategorySlug" ,"SearchStory", new {area = "ViewStory"})",
+                method: "GET",
+                data: {
+                    categorySlug: categorySlug,
+                    type: type,
+                    count: count,
+                },
+                success: function (res) {
+                    var box = $(container);
+                    box.empty();
+                    box.hide();
+                    if (res == null) return;
+                    
+                    for (var item of res) {
+                        var url =
+                            `@Url.Action("DetailStory", new {area = "ViewStory", storySlug="replacethis"})`.replace(
+                                "replacethis",
+                                item.storySlug
+                            );
+                        var full = item.storyState
+                            ? `<span class=" translate-middle badge bg-success">
+                                    Full
+                                    <span class="visually-hidden">unread messages</span>
+                                </span>`
+                            : "";
+                        box.append(
+                            $(`
+                        <div class=" col-xl-2 col-lg-3 col-md-3 col-sm-4 col-6">
+                            <a href="${url}" class="story d-block">
+                                ${full}
+                                <img class="img-fluid w-100" src="/contents/story_thumb/${item.photo.fileName}" alt="">
+                                <div class="story-title position-absolute bottom-0 start-0 w-100 text-center">
+                                    <p>${item.storyName} </p>
+                                </div>
+                            </a>
+                        </div>`)
+                        ).fadeIn(500);
+                    }
+                },
+    });
+        }
+
+        function SetEventSelect() {
+            $("#hot-select").change(function () {
+                let categorySlug = $(this).val();
+                let newUrl = `@Url.Action("SearchCategory" ,"SearchStory", new {area = "ViewStory", categorySlug="replaceMe"})`.replace('replaceMe', categorySlug)
+                LoadStories("hot_select", categorySlug, 12, "#box-hot-select");
+                $("#hot-select-link").attr("href", newUrl);
+                                        
+            });
+            $("#full-select").change(function () {
+                let categorySlug = $(this).val();
+                let newUrl =`@Url.Action("SearchCategory" ,"SearchStory", new {area = "ViewStory",isFull="true", categorySlug="replaceMe"})`.replace('replaceMe', categorySlug)
+                LoadStories("full_select", categorySlug, 12, "#box-full-select");
+                $("#full-select-link").attr("href",newUrl )
+            });
+        }
+        $(document).ready(function () {
+            LoadStories("hot_select", null, 12, "#box-hot-select");
+            LoadStories("full_select", null, 12, "#box-full-select");
+            SetEventSelect();
+        });
+
+    </script>
+}

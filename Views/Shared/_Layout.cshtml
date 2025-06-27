@@ -1,0 +1,199 @@
+﻿@inject truyenchu.Data.AppDbContext dbContext
+@{
+    var categories  = dbContext.Categories.ToList();
+    var breadcrumbs = ViewBag.breadcrumbs as List<BreadCrumbModel>;
+}
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>@ViewData["Title"]</title>
+    <link rel="apple-touch-icon" sizes="180x180" href="/contents/favicon/apple-touch-icon.png">
+    <link rel="icon" type="image/png" sizes="32x32" href="/contents/favicon/favicon-32x32.png">
+    <link rel="icon" type="image/png" sizes="16x16" href="/contents/favicon/favicon-16x16.png">
+
+    <link rel="stylesheet" href="~/lib/bootstrap/dist/css/bootstrap.min.css" />
+    <link rel="stylesheet" href="~/lib/bootstrap-icons/font/bootstrap-icons.min.css" />
+    <link rel="stylesheet" href="~/css/main.min.css" asp-append-version="true" />
+    <link rel="stylesheet" href="~/css/index.css" asp-append-version="true" />
+
+    <script src="~/lib/jquery/dist/jquery.min.js"></script>
+    <script src="~/lib/bootstrap/dist/js/bootstrap.bundle.min.js"></script>
+
+    @* Font awesome *@
+    <link href="~/lib/fontawesome-free/css/all.min.css" rel="stylesheet" type="text/css">
+
+    @* AutoComplete *@
+    <script src="~/lib/typeahead/bloodhound.min.js"></script>
+    <script src="~/lib/typeahead/typeahead.bundle.min.js"></script>
+    <script src="~/lib/typeahead/typeahead.jquery.min.js"></script>
+
+    <script src="~/js/site.js" asp-append-version="true"></script>
+    <script src="~/js/header.js" asp-append-version="true"></script>
+</head>
+<body class="dark-theme">
+    <header>
+        <nav id="navbartop" class="navbar navbar-expand-md navbar-toggleable-md navbar-dark bg-white box-shadow">
+            <div class="container">
+                <!-- Logo/Home -->
+                <a class="navbar-brand" asp-area="" asp-controller="Home" asp-action="Index">
+                    <i class="bi bi-book-half fs-3"></i>
+                    TRUYỆN CHỮ
+                </a>
+                <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target=".navbar-collapse" aria-controls="navbarSupportedContent"
+                        aria-expanded="false" aria-label="Toggle navigation">
+                    <span class="navbar-toggler-icon"></span>
+                </button>
+                <div class="navbar-collapse collapse d-md-inline-flex justify-content-between">
+                    <!-- Navbar -->
+                    <ul class="navbar-nav flex-grow-1">
+                        <li class="nav-item dropdown">
+                            <a class="nav-link dropdown-toggle" href="#" role="button" data-bs-toggle="dropdown" aria-expanded="false">
+                                Thể loại
+                            </a>
+                            <ul class="dropdown-menu pe-2" style="min-width: 400px;">
+                                <div>
+                                    <div class="row">
+                                        @foreach (var category in categories)
+                                        {
+                                            <div class="col-md-4">
+                                                <li><a asp-area="ViewStory" asp-controller="SearchStory" asp-action="SearchCategory" asp-route-categorySlug="@category.CategorySlug" class="dropdown-item">@category.CategoryName</a></li>
+                                            </div>
+                                        }
+                                    </div>
+                                </div>
+                            </ul>
+                        </li>
+                        <li class="nav-item dropdown">
+                            <a class="nav-link dropdown-toggle" href="#" role="button" data-bs-toggle="dropdown" aria-expanded="false">
+                                Phân loại theo chương
+                            </a>
+                            <ul class="dropdown-menu">
+                                <li><a class="dropdown-item" asp-controller="SearchStory" asp-action="SearchRange" asp-route-rangeSlug="duoi-100-chuong">Dưới 100 chương</a></li>
+                                <li><a class="dropdown-item" asp-controller="SearchStory" asp-action="SearchRange" asp-route-rangeSlug="100-500-chuong">Từ 100 đến 500 chương</a></li>
+                                <li><a class="dropdown-item" asp-controller="SearchStory" asp-action="SearchRange" asp-route-rangeSlug="500-1000-chuong">Từ 500 đến 1000 chương</a></li>
+                                <li><a class="dropdown-item" asp-controller="SearchStory" asp-action="SearchRange" asp-route-rangeSlug="tren-1000-chuong">Trên 1000 chương</a></li>
+                            </ul>
+                        </li>
+                        <partial name="_SettingPartial" />
+                    </ul>
+            <!-- Tìm kiếm -->
+            <partial name="_SearchStoryPartial" />
+            </div>
+
+            <!-- Auth Buttons -->
+            <div class="auth-buttons">
+                    @if (User.Identity.IsAuthenticated)
+                    {
+                        // Kiểm tra vai trò nếu cần
+                        <div style="display: flex; align-items: center;">
+
+                                <a href="/Admin/Index" class="btn btn-secondary ms-2">Cài đật</a>
+                            
+                            <form id="logout-form" method="post" action="/Account/LogOff">
+                                @Html.AntiForgeryToken()
+                                <a href="javascript:void(0);" onclick="logOff()" class="btn btn-outline-danger ms-2">Đăng xuất</a>
+                            </form>
+                        </div>
+
+                    }
+                    else
+                    {
+                        @* <!-- Hiển thị Đăng nhập/Đăng ký khi chưa đăng nhập --> *@
+                        <a href="/login" class="btn btn-outline-primary ms-4">Đăng nhập</a>
+                        <a href="/register" class="btn btn-primary ms-2">Đăng ký</a>
+                    }
+                    @{
+                        var isAuthenticated = User.Identity.IsAuthenticated;
+                        var userName = User.Identity.Name;
+                        var isAdmin = User.IsInRole("Administrator");
+
+                        <script>
+                            console.log("IsAuthenticated: @isAuthenticated, UserName: @userName, IsAdmin: @isAdmin");
+                        </script>
+                    }
+
+            </div>
+
+        </nav>
+        <!-- Breadcrumb -->
+        <div id="breadcrumb">
+            <div class="container">
+                <nav aria-label="breadcrumb pt-2">
+                    <ol class="breadcrumb">
+                        @if (breadcrumbs?.Count > 0)
+                        {
+                            @foreach (var b in breadcrumbs)
+                            {
+                                if (b.IsActive)
+                                {
+                                    <li class="breadcrumb-item active" aria-current="page">@b.DisplayName</li>
+                                }
+                                else
+                                {
+                                    <li class="breadcrumb-item"><a href="@b.Url">@b.DisplayName</a></li>
+                                }
+                            }
+                        }
+                        else
+                        {
+                            <li class="breadcrumb-item active" aria-current="page">Đọc truyện online hoàn toàn miễn phí tại TruyenChu.somee.com</li>
+                        }
+                    </ol>
+                </nav>
+            </div>
+        </div>
+    </header>
+
+    <div class="container">
+        <main role="main" class="pb-3">
+            @RenderBody()
+        </main>
+    </div>
+    <script>
+        function logOff() {
+            const form = document.getElementById("logout-form");
+            const csrfToken = form.querySelector('input[name="__RequestVerificationToken"]').value;
+
+            fetch('/Account/LogOff', {
+                method: 'POST',
+                headers: {
+                    'Content-Type': 'application/x-www-form-urlencoded',
+                    'RequestVerificationToken': csrfToken
+                },
+                body: '__RequestVerificationToken=' + encodeURIComponent(csrfToken)
+            })
+            .then(response => {
+                if (response.ok) {
+                    window.location.href = '/'; // Điều hướng về giao diện chính
+                } else {
+                    console.error("Đăng xuất thất bại.");
+                }
+            })
+            .catch(error => console.error('Error:', error));
+        }
+    </script>
+    <footer class="footer text-muted">
+        <div class="container">
+            <div class="row justify-content-between align-items-center">
+                <div class="col-md-6">
+                    truyenchu.somee.com - Copyright &copy;2023. 
+                </div>
+                <div class="col-md-6 text-lg-end">
+                    Design by Student & Lecturer VNUA <br>
+                    <div class="mb-2"></div>
+                    <a href="https://www.facebook.com/thanhtam.truongvan.9" target="_blank">
+                        <i class="fab fa-facebook-f"></i>
+                    </a>   
+                    <a href="malto:vn.truongthanhtam8a@gmail.com">
+                        <i class="fas fa-envelope"></i>
+                    </a>
+                </div>
+            </div>
+        </div>
+    </footer>
+   
+    @await RenderSectionAsync("Scripts", required: false)
+</body>
+</html>

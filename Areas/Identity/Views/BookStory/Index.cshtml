@@ -1,0 +1,79 @@
+﻿@using UserStoryModel = truyenchu.Areas.Identity.Models.UserStory.UserStory
+
+@model IEnumerable<UserStoryModel>
+
+@{
+    ViewData["Title"] = "Tủ truyện của bạn";
+}
+
+<h2>@ViewData["Title"]</h2>
+
+<table class="table table-striped">
+    <thead>
+        <tr>
+            <th>STT</th>
+            <th>Tên truyện</th>
+            <th>Ngày thêm</th>
+            <th>Hành động</th>
+        </tr>
+    </thead>
+    <tbody>
+        @if (Model != null && Model.Any())
+        {
+            int index = 1;
+            foreach (var item in Model)
+            {
+                <tr>
+                    <td>@index</td>
+                    <td>@item.Story.StoryName</td>
+                    <td>@item.DateAdded.ToString("dd/MM/yyyy")</td>
+                    <td>
+                        <!-- Nút Xóa -->
+                        <button class="btn btn-danger" onclick="removeFromBookStory(@item.Story.StoryId)">
+                            Xóa
+                        </button>
+
+                        <!-- Nút Đọc truyện -->
+                        <a class="btn btn-primary ms-2" href="https://localhost:7020/@item.Story.StorySlug">
+                            Đọc truyện
+                        </a>
+                    </td>
+                </tr>
+                index++;
+            }
+        }
+        else
+        {
+            <tr>
+                <td colspan="4" class="text-center">Không có truyện nào trong tủ của bạn.</td>
+            </tr>
+        }
+    </tbody>
+</table>
+
+<script>
+
+        function removeFromBookStory(storyId) {
+        if (!confirm("Bạn có chắc chắn muốn xóa truyện này khỏi tủ không?")) {
+            return;
+        }
+
+        $.ajax({
+            url: '/BookStory/RemoveFromBookStory',
+            type: 'POST',
+            data: { storyId: storyId },
+            success: function (response) {
+                if (response.success) {
+                    alert(response.message);
+                    location.reload(); // Reload trang sau khi xóa thành công
+                } else {
+                    alert(response.message);
+                }
+            },
+            error: function () {
+                alert('Có lỗi xảy ra. Vui lòng thử lại.');
+            }
+        });
+    }
+
+</script>

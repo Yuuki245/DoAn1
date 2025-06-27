@@ -1,0 +1,79 @@
+@{
+    ViewData["Title"] = "Thể loại truyện";
+    ViewData["ActivePage"] = ManageNavPages.Category;
+}
+
+
+<div class="d-lg-flex align-items-center mb-2">
+    <a class="btn btn-success" asp-action="Create">+ Thêm mới</a>
+    <div
+        class="border mr-5 my-2 ml-lg-2 my-md-2 mw-100 navbar-search">
+        <div class="input-group">
+            <input id="search" type="search" class="form-control border-0 bg-light w-100 small" placeholder="Tìm kiếm..."
+                aria-label="Search" aria-describedby="basic-addon2">
+        </div>
+    </div>
+    <partial name="_StatusMessage" />
+</div>
+<table class="table table-striped">
+    <thead>
+        <tr>
+            <th>STT</th>
+            <th>Thể loại</th>
+            <th>URL</th>
+            <th>Hành động</th>
+        </tr>
+    </thead>
+    <tbody>
+        @* Ajax call data here *@
+    </tbody>
+</table>
+<div id="paging">
+    @* Ajax call pagination here *@
+</div>
+
+
+
+@section Scripts {
+    <script>
+        const GetData = (searchStr = '') => {
+            var url = '@Url.Action("GetCategories")'
+            var formData = {
+                searchStr: searchStr,
+            }
+            Paging.CreatePaging("#paging", "table tbody", url, formData, (response) => {
+                var html = '';
+                var stt = (response.currentPage - 1) * "@Const.CATEGORIES_FOUND_PER_PAGE"
+                for (let item of response.data) {
+                    html += `
+                        <tr>
+                            <td>
+                                ${++stt}
+                            </td>
+                            <td>
+                                <a href="@Url.Action("Details", new {Id="replaceId"})">${item.categoryName}</a>
+                            </td>
+                            <td>
+                                ${item.categorySlug}
+                            </td>
+                            <td>
+                                <a href="@Url.Action("Edit", new {Id="replaceId"})" class="btn px-4 btn-warning" asp-action="Edit">Sửa</a>
+                                <a href="@Url.Action("Delete", new {Id="replaceId"})" class="btn px-4 btn-danger" asp-action="Delete">Xóa</a>
+                            </td>
+                        </tr>
+                    `.replaceAll('replaceId', `${item.categoryId}`)
+                }
+                return html;
+            }, true)
+        }
+        const AsignSearchEvent = () => {
+            $("#search").change(function (e) {
+                GetData(e.target.value)
+            })
+        }
+        $(document).ready(function() {
+            GetData()
+            AsignSearchEvent()
+        })
+    </script>
+}

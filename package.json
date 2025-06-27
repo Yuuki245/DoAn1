@@ -1,0 +1,22 @@
+{
+  "dependencies": {
+    "bootstrap-icons": "^1.10.5",
+    "elfinder-material-theme": "^2.1.15",
+    "gulp": "^4.0.2",
+    "gulp-concat": "^2.6.1",
+    "gulp-cssmin": "^0.2.0",
+    "gulp-less": "^5.0.0",
+    "gulp-postcss": "^9.0.1",
+    "gulp-rename": "^2.0.0",
+    "gulp-sass": "^5.1.0",
+    "gulp-uglify": "^3.0.2",
+    "node-sass": "^9.0.0",
+    "postcss": "^8.4.24",
+    "rimraf": "^5.0.1",
+    "sass": "^1.63.6",
+    "stickybits": "^3.7.11"
+  },
+  "devDependencies": {
+    "eslint": "^9.16.0"
+  }
+}

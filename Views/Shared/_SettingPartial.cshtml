@@ -1,0 +1,112 @@
+@using truyenchu.Utilities
+@using truyenchu.Models.Home
+@{
+    var themes = new ThemeModel[] {
+        new ThemeModel() {Name="mautoi", ClassTheme = "dark-theme",UrlBgImage = "/contents/background/bg-dark.gif", DisplayName="Màu tối" },
+        new ThemeModel() {Name="mausang", ClassTheme = "light-theme",UrlBgImage = "/contents/background/bg-light.png", DisplayName="Màu sáng"},
+        new ThemeModel() {Name="xanhduong", ClassTheme = "dark-theme",UrlBgImage = "/contents/background/bg-blue.png", DisplayName="Xanh dương"},
+        new ThemeModel() {Name="vangnhat", ClassTheme = "dark-theme",UrlBgImage = "/contents/background/bg-dark-yellow.png", DisplayName="Vàng nhạt"},
+        new ThemeModel() {Name="donhat", ClassTheme = "dark-theme",UrlBgImage = "/contents/background/bg-red.png", DisplayName="Đỏ nhạt"},
+        new ThemeModel() {Name="xanhreu", ClassTheme = "dark-theme",UrlBgImage = "/contents/background/bg-dark-green.png", DisplayName="Xanh rêu"},
+    };
+
+    var fontFamily = new List<string>() { "cursive", "sans-serif", "serif", "monospace" };
+    var minFontSize = 16;
+    var maxFontSize = 40;
+    var lineHeights = new[] {
+        new {value="1em",displayname="100%"},
+        new {value="1.2em",displayname="120%"},
+        new {value="1.4em",displayname="140%"},
+        new {value="1.6em",displayname="160%"},
+        new {value="1.8em",displayname="180%"},
+        new {value="2em",displayname="200%"}
+    };
+
+
+}
+@if (TempData["ShowSettingMenu"] != null) {
+    <li class="nav-item dropdown">
+        <a class="nav-link dropdown-toggle" href="#" role="button" data-bs-toggle="dropdown" aria-expanded="false">
+            Tùy chỉnh
+        </a>
+        <div class="dropdown-menu story-setting">
+            <form>
+                <div class="form-group">
+                    <div class="col-5">
+                        <label for="" class="form-label">Màu nền</label>
+                    </div>
+                    <div class="col-7">
+                        @{
+                            ThemeModel currentTheme = null;
+                            var themeCookieStr = Context.Request.Cookies["theme"];
+                            if (themeCookieStr !=null) 
+                                currentTheme = AppUtilities.Base64DecodeObject<ThemeModel>(themeCookieStr);
+                        }
+                        <select name="maunen" id="" class="form-select">
+                            @foreach (var theme in themes)
+                            {
+                                var selected_theme = false;
+                                if (currentTheme != null && currentTheme.Name == theme.Name)
+                                    selected_theme = true;
+
+                                <option selected="@selected_theme" value='@AppUtilities.Base64EncodeObject(theme)'>@theme.DisplayName</option>
+                            }
+                        </select>
+                    </div>
+                </div>
+                <div class="form-group">
+                    <div class="col-5">
+                        <label for="" class="form-label">Font chữ</label>
+                    </div>
+                    <div class="col-7">
+                        @{
+                            var current_fontFamily = Context.Request.Cookies["font-family"];
+                        }
+                        <select name="font-family" id="" class="form-select">
+                            @foreach (var font in fontFamily)
+                            {
+                                var selected_font = font == current_fontFamily;
+                                <option selected="@selected_font" value="@font">@font</option>
+
+                            }
+                        </select>
+                    </div>
+                </div>
+                <div class="form-group">
+                    <div class="col-5">
+                        <label for="" class="form-label">Size chữ</label>
+                    </div>
+                    <div class="col-7">
+                        @{
+                            var current_fontSize = Context.Request.Cookies["font-size"];
+                        }
+                        <select name="font-size" id="" class="form-select">
+                            @for (var i = minFontSize; i <= maxFontSize; i += 2)
+                            {
+                                var selected_size = current_fontSize == i + "px" ? true : false;
+                                <option selected="@selected_size" value="@(i)px">@i</option>
+                            }
+                        </select>
+                    </div>
+                </div>
+                <div class="form-group">
+                    <div class="col-5">
+                        <label for="" class="form-label">Chiều cao dòng</label>
+                    </div>
+                    <div class="col-7">
+                        @{
+                            var current_lineHeight = Context.Request.Cookies["line-height"];
+                        }
+                        <select name="line-height" id="" class="form-select">
+                            @foreach (var item in lineHeights)
+                            {
+                                var selected_lineheight = current_lineHeight == item.value;
+                                <option selected="@selected_lineheight" value="@item.value">@item.displayname</option>
+                            }
+                        </select>
+                    </div>
+                </div>
+            </form>
+        </div>
+    </li>
+}

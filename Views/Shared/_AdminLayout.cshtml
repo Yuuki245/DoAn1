@@ -1,0 +1,216 @@
+﻿@{
+    var actionPage = ViewData["ActivePage"] as string;
+}
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>@ViewData["Title"] - Admin</title>
+    <link rel="apple-touch-icon" sizes="180x180" href="/contents/favicon/apple-touch-icon.png">
+    <link rel="icon" type="image/png" sizes="32x32" href="/contents/favicon/favicon-32x32.png">
+    <link rel="icon" type="image/png" sizes="16x16" href="/contents/favicon/favicon-16x16.png">
+    
+    <link rel="stylesheet" href="~/lib/bootstrap/dist/css/bootstrap.min.css" />
+    <link rel="stylesheet" href="~/lib/bootstrap-icons/font/bootstrap-icons.min.css" />
+
+    <link href="~/lib/fontawesome-free/css/all.min.css" rel="stylesheet" type="text/css">
+    <link href="~/css/sb-admin-2.min.css" rel="stylesheet">
+    <link href="~/lib/typeahead/style.css" rel="stylesheet">
+    <link href="~/css/main.admin.min.css" rel="stylesheet">
+
+    <script src="~/lib/jquery/dist/jquery.min.js"></script>
+    <script src="~/lib/jquery-easing/jquery.easing.min.js"></script>
+
+    <script src="~/lib/bootstrap/dist/js/bootstrap.bundle.min.js"></script>
+    
+
+    @* AutoComplete *@
+    <script src="~/lib/typeahead/bloodhound.min.js"></script>
+    <script src="~/lib/typeahead/typeahead.bundle.min.js"></script>
+    <script src="~/lib/typeahead/typeahead.jquery.min.js"></script>
+    
+    @* Sumernote *@
+    <link rel="stylesheet" href="~/lib/summernote/summernote-lite.min.css" />
+    <script src="~/lib/summernote/summernote-lite.min.js"></script>
+
+
+    @* My js *@
+    <script src="~/js/collapse.admin.js"></script>
+    <script src="~/js/paging.js"></script>
+
+</head>
+
+<body id="page-top">
+
+    <!-- Page Wrapper -->
+    <div id="wrapper">
+
+        <!-- Sidebar -->
+        <ul class="navbar-nav bg-gradient-primary sidebar sidebar-dark accordion" id="accordionSidebar">
+
+            <!-- Sidebar - Brand -->
+            <a class="sidebar-brand d-flex align-items-center justify-content-center" href="/">
+                <div class="sidebar-brand-icon rotate-n-15">
+                    <i class="bi bi-book-half fs-3"></i>
+                </div>
+                <div class="sidebar-brand-text mx-3">Truyện chữ¯</div>
+            </a>
+
+            <!-- Divider -->
+            <hr class="sidebar-divider my-0">
+
+            <!-- Nav Item - Dashboard -->
+            <li class="nav-item">
+                <a class="nav-link"  asp-area="Admin" asp-controller="Admin" asp-action="Index">
+                    <i class="fas fa-fw fa-tachometer-alt"></i>
+                    <span>Dashboard</span>
+                </a>
+            </li>
+
+            <!-- Divider -->
+            <hr class="sidebar-divider">
+
+            <!-- Heading -->
+            <div class="sidebar-heading">
+                Quản lý truyện
+            </div>
+
+            <!-- Nav Item - Pages Collapse Menu -->
+            <li class="nav-item">
+                <a class="nav-link collapsed" href="#collapseTwo" data-bs-toggle="collapse"
+                    aria-expanded="true" aria-controls="collapseTwo">
+                    <i class="fas fa-fw fa-cog"></i>
+                    <span>Quản lý danh mục</span>
+                </a>
+                <div id="collapseTwo" class="collapse" aria-labelledby="headingTwo" data-bs-parent="#accordionSidebar">
+                    <div class="bg-white py-2 collapse-inner rounded">
+                        <a class="collapse-item @ManageNavPages.AuthorNavClass(actionPage)" asp-area="Admin" asp-controller="Author" asp-action="Index" >
+                            <i class="fas fa-user-edit fa-lg"></i>
+                            Tác giả
+                        </a>
+                        <a class="collapse-item @ManageNavPages.CategoryNavClass(actionPage)" asp-area="Admin" asp-controller="Category" asp-action="Index" >
+                            <i class="bi bi-bookmarks-fill fa-lg"></i>
+                            Thể loại truyện
+                        </a>
+                    </div>
+                </div>
+            </li>
+
+            <li class="nav-item">
+                <a class="nav-link collapsed" href="#collapseThree" data-bs-toggle="collapse"
+                    aria-expanded="true" aria-controls="collapseThree">
+                    <i class="fas fa-fw fa-cog"></i>
+                    <span>Quản lý truyện</span>
+                </a>
+                <div id="collapseThree" class="collapse" aria-labelledby="headingTwo" data-bs-parent="#accordionSidebar">
+                    <div class="bg-white py-2 collapse-inner rounded">
+                        <a class="collapse-item @ManageNavPages.StoryNavClass(actionPage)" asp-area="Admin" asp-controller="Story" asp-action="Index" >
+                            <i class="bi bi-book-fill fa-lg"></i>
+                            Truyện
+                        </a>
+                    </div>
+                </div>
+            </li>
+
+            <!-- Nav Item - Utilities Collapse Menu -->
+            <li class="nav-item @ManageNavPages.UserNavClass(actionPage)">
+                <a asp-area="Identity" asp-controller="User" asp-action="Index" class="nav-link" aria-controls="collapseUtilities">
+                    <i class="fas fa-user fa-lg"></i>
+                    <span>Quản lý người dùng</span>
+                </a>
+            </li>
+
+            <li class="nav-item @ManageNavPages.BookStoryNavClass(actionPage)">
+                <a asp-area="Identity" asp-controller="BookStory" asp-action="Index" class="nav-link" aria-controls="collapseUtilities">
+                    <i class="fas fa-user fa-lg"></i>
+                    <span>Tủ truyện</span>
+                </a>
+            </li>
+
+            <li class="nav-item @ManageNavPages.UserAccountNavClass(actionPage)">
+                <a asp-area="Identity" asp-controller="UserAccount" asp-action="MyAccount" class="nav-link">
+                    <i class="fas fa-user fa-lg"></i>
+                    <span>Thông tin cá nhân</span>
+                </a>
+            </li>
+
+            <!-- Divider -->
+            <hr class="sidebar-divider">
+
+            <!-- Sidebar Toggler (Sidebar) -->
+            <div class="text-center d-none d-md-inline">
+                <button class="rounded-circle border-0" id="sidebarToggle"></button>
+            </div>
+
+        </ul>
+        <!-- End of Sidebar -->
+
+        <!-- Content Wrapper -->
+        <div id="content-wrapper" class="d-flex flex-column">
+
+            <!-- Main Content -->
+            <div id="content">
+
+                <!-- Topbar -->
+                <nav class="navbar navbar-expand navbar-light bg-white topbar mb-4 static-top shadow">
+
+                    <!-- Sidebar Toggle (Topbar) -->
+                    <button id="sidebarToggleTop" class="btn btn-link d-md-none rounded-circle mr-3">
+                        <i class="fa fa-bars"></i>
+                    </button>
+
+
+                    <!-- Topbar Title -->
+                    <h4 class="text-dark fw-semibold">@ViewData["Title"]</h4>
+                    
+
+                    <!-- Topbar Navbar -->
+                    <ul class="navbar-nav ml-auto">
+
+                        <!-- Nav Item - User Information -->
+                        @await Component.InvokeAsync(nameof(truyenchu.Components.Login))
+
+                    </ul>
+
+                </nav>
+                <!-- End of Topbar -->
+
+                <!-- Begin Page Content -->
+                <div id="page-content" class="container-fluid">
+                    @RenderBody()
+                </div>
+                <!-- /.container-fluid -->
+
+            </div>
+            <!-- End of Main Content -->
+
+            <!-- Footer -->
+            <footer class="sticky-footer bg-white">
+                <div class="container my-auto">
+                    <div class="copyright text-center my-auto">
+                        <span>Sinh viên học viện nông nghiệp Việt Nam</span>
+                    </div>
+                </div>
+            </footer>
+            <!-- End of Footer -->
+
+        </div>
+        <!-- End of Content Wrapper -->
+
+    </div>
+    <!-- End of Page Wrapper -->
+
+    <!-- Scroll to Top Button-->
+    <a class="scroll-to-top rounded" href="#page-top">
+        <i class="fas fa-angle-up"></i>
+    </a>
+
+    <!-- Custom scripts for all pages-->
+    <script src="~/js/sb-admin-2.min.js"></script>
+    @await RenderSectionAsync("Scripts", required: false)
+</body>
+
+</html>
+

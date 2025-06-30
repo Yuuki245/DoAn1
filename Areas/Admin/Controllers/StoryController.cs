@@ -232,6 +232,9 @@ namespace truyenchu.Areas.Admin.Controllers
                     story.StoryState = model.StoryState;
                     story.DateUpdated = DateTime.Now;
 
+                    // CẬP NHẬT SLUG
+                    story.StorySlug = GenerateStorySlug(story.StoryName, story.StoryId);
+
                     if (file != null)
                     {
                         var photo = await _context.StoryPhotos.FindAsync(story.PhotoId);
@@ -329,7 +332,11 @@ namespace truyenchu.Areas.Admin.Controllers
             {
                 return Problem("Entity set 'AppDbContext.Stories'  is null.");
             }
-            var story = await _context.Stories.Include(x => x.Photo).FirstOrDefaultAsync(x => x.StoryId == storyId);
+            var story = await _context.Stories
+                                      .Include(s => s.Photo)
+                                      .Include(s => s.StoryCategory) // Bao gồm StoryCategory
+                                      .Include(s => s.Chapters)      // Bao gồm Chapters
+                                      .FirstOrDefaultAsync(x => x.StoryId == storyId);
             if (story != null)
             {
                 if (story.Photo.FileName != Const.STORY_THUMB_NO_IMAGE)

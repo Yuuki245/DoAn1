@@ -14,6 +14,7 @@ using truyenchu.Data;
 using truyenchu.Models;
 using truyenchu.Service;
 using truyenchu.Utilities;
+using truyenchu.Areas.Identity.Models.UserStory;
 
 namespace truyenchu.Areas.Admin.Controllers
 {
@@ -330,27 +331,70 @@ namespace truyenchu.Areas.Admin.Controllers
         {
             if (_context.Stories == null)
             {
-                return Problem("Entity set 'AppDbContext.Stories'  is null.");
+                StatusMessage = "Lỗi: Tập dữ liệu truyện không tồn tại.";
+                return Problem("Entity set 'AppDbContext.Stories' is null.");
             }
+
+            // Cần Include tất cả các thực thể con có thể gây xung đột ràng buộc khi xóa Story
+            // để có thể kiểm tra hoặc xóa chúng
             var story = await _context.Stories
                                       .Include(s => s.Photo)
-                                      .Include(s => s.StoryCategory) // Bao gồm StoryCategory
-                                      .Include(s => s.Chapters)      // Bao gồm Chapters
+                                      .Include(s => s.StoryCategory)
+                                      .Include(s => s.Chapters)
                                       .FirstOrDefaultAsync(x => x.StoryId == storyId);
-            if (story != null)
+
+            if (story == null)
             {
-                if (story.Photo.FileName != Const.STORY_THUMB_NO_IMAGE)
+                StatusMessage = "Lỗi: Truyện không tìm thấy.";
+                return RedirectToAction(nameof(Index));
+            }
+
+            try
+            {
+                // KIỂM TRA RÀNG BUỘC 1: Kiểm tra xem truyện có còn chương nào không
+                if (story.Chapters != null && story.Chapters.Any())
+                {
+                    StatusMessage = $"Lỗi: Không thể xóa truyện '{story.StoryName}' vì vẫn còn {story.Chapters.Count} chương liên quan. Vui lòng xóa hết các chương hoặc gán chúng cho truyện khác trước khi xóa truyện này.";
+                    return RedirectToAction(nameof(Index)); // Ngăn chặn xóa và báo lỗi
+                }
+
+
+
+                // Nếu đã vượt qua các kiểm tra ràng buộc, tiến hành xóa các phần phụ thuộc trong code
+                // (Chỉ xóa những cái mà bạn muốn xóa cùng lúc hoặc đã được kiểm tra ở trên)
+
+                // Xóa ảnh bìa của truyện nếu không phải là ảnh mặc định
+                if (story.Photo != null && story.Photo.FileName != Const.STORY_THUMB_NO_IMAGE)
+                {
                     AppUtilities.DeletePhoto(story.Photo.FileName);
+                    _context.StoryPhotos.Remove(story.Photo);
+                }
 
+                // Xóa tất cả các thể loại liên kết với truyện này
+                // Mặc dù DataTruyenOnline.sql có ON DELETE CASCADE cho StoryCategory,
+                // việc xóa tường minh trong code vẫn đảm bảo tính nhất quán nếu có bất kỳ vấn đề nào.
+                if (story.StoryCategory != null && story.StoryCategory.Any())
+                {
+                    _context.StoryCategories.RemoveRange(story.StoryCategory);
+                }
+
+                // Cuối cùng, xóa bản thân truyện
                 _context.Stories.Remove(story);
-                StatusMessage = "Xóa truyện thành công";
+                await _context.SaveChangesAsync();
+                StatusMessage = $"Đã xóa truyện '{story.StoryName}' thành công.";
             }
-            else
+            catch (DbUpdateException ex)
             {
-                _logger.LogInformation("story null");
+                // Bắt lỗi liên quan đến ràng buộc database khác (phòng trường hợp có ràng buộc chưa lường trước)
+                _logger.LogError(ex, "Lỗi khi xóa truyện {StoryId}. Chi tiết: {Message}", storyId, ex.Message);
+                StatusMessage = $"Lỗi: Không thể xóa truyện '{story.StoryName}' do lỗi cơ sở dữ liệu. Vui lòng kiểm tra các liên kết khác hoặc liên hệ quản trị viên.";
             }
-
-            await _context.SaveChangesAsync();
+            catch (Exception ex)
+            {
+                // Bắt các lỗi không xác định khác
+                _logger.LogError(ex, "Lỗi không xác định khi xóa truyện {StoryId}", storyId);
+                StatusMessage = $"Lỗi: Đã xảy ra lỗi không mong muốn khi xóa truyện '{story.StoryName}'.";
+            }
 
             return RedirectToAction(nameof(Index));
         }

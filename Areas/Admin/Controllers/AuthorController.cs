@@ -167,17 +167,45 @@ namespace truyenchu.Areas.Admin.Controllers
         {
             if (_context.Authors == null)
             {
-                return Problem("Entity set 'AppDbContext.Authors'  is null.");
+                StatusMessage = "Lỗi: Tập dữ liệu tác giả không tồn tại.";
+                return RedirectToAction(nameof(Index));
             }
+
             var author = await _context.Authors.FindAsync(authorId);
-            if (author != null)
+            if (author == null)
             {
-                _context.Authors.Remove(author);
+                StatusMessage = "Lỗi: Tác giả không tìm thấy.";
+                return RedirectToAction(nameof(Index));
             }
 
-            await _context.SaveChangesAsync();
+            try
+            {
+                // KIỂM TRA RÀNG BUỘC: Kiểm tra xem tác giả có còn truyện nào không
+                var hasStories = await _context.Stories.AnyAsync(s => s.AuthorId == authorId);
+                if (hasStories)
+                {
+                    StatusMessage = $"Lỗi: Không thể xóa tác giả '{author.AuthorName}' vì vẫn còn truyện liên quan. Vui lòng gỡ tác giả này khỏi tất cả các truyện trước khi xóa.";
+                    return RedirectToAction(nameof(Index)); // Chuyển hướng về trang Index với thông báo lỗi
+                }
 
-            StatusMessage = "Xóa tác giả thành công";
+                // Nếu không có truyện liên quan, tiến hành xóa tác giả
+                _context.Authors.Remove(author);
+                await _context.SaveChangesAsync();
+                StatusMessage = $"Đã xóa tác giả '{author.AuthorName}' thành công.";
+            }
+            catch (DbUpdateException ex)
+            {
+                // Bắt lỗi liên quan đến ràng buộc database khác (phòng trường hợp có ràng buộc chưa lường trước)
+                _logger.LogError(ex, "Lỗi khi xóa tác giả {AuthorId}. Có thể do ràng buộc database.", authorId);
+                StatusMessage = $"Lỗi: Không thể xóa tác giả '{author.AuthorName}' do lỗi cơ sở dữ liệu. Vui lòng kiểm tra các liên kết khác.";
+            }
+            catch (Exception ex)
+            {
+                // Bắt các lỗi không xác định khác
+                _logger.LogError(ex, "Lỗi không xác định khi xóa tác giả {AuthorId}", authorId);
+                StatusMessage = $"Lỗi: Đã xảy ra lỗi không mong muốn khi xóa tác giả '{author.AuthorName}'.";
+            }
+
             return RedirectToAction(nameof(Index));
         }
 
